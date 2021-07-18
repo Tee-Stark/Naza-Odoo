@@ -14,7 +14,7 @@ const getTransactionsByCustomer = async (req, res) => {
     }
     await feedBack.success(
       res,
-      400,
+      200,
       "Successfully returned transactions",
       result
     );
@@ -60,7 +60,7 @@ const getTransactionById = async (req, res) => {
     ? req.query.fields.split(",")
     : ["partner_id", "amount", "payment_method_id"];
   try {
-    const result = odoo.searchRead("account.payment", { id: id }, fields);
+    const result = odoo.searchRead("account.payment", ["id", "=", id], fields);
     if (!result) {
       return await feedBack.failed(res, 404, "Tansaction does not exist", null);
     }

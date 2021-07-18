@@ -1,6 +1,7 @@
 //view purchase orders
 const odoo = require("../config/odoo");
 const feedBack = require("../handler/feedbackHandler");
+const checkout = require("./checkout.js");
 const {checkoutOrder} = require("./checkout.js");
 //create a new purchase order
 const createPurchaseOrder = async (req, res) => {
@@ -92,15 +93,15 @@ const deletePurchaseOrder = async (req, res) => {
   }
 };
 
-/*/chackout order
+//checkout and pay for purchase
 const checkoutPurchaseOrder = async (req, res) => {
-
-}*/
+  return checkout("purchase");
+};
 
 module.exports = {
   createPurchaseOrder,
   getPurchaseOrderById,
   getUserPurchaseOrders,
   deletePurchaseOrder,
-  //checkoutPurchaseOrder
+  checkoutPurchaseOrder
 };

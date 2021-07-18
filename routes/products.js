@@ -12,7 +12,7 @@ const {
   getRelatedProducts,
   getCategories,
   bestSellingProducts,
-  searchProducts,
+  searchProduct,
   getProductsByCategory,
 } = require("../controllers/products");
 
@@ -20,7 +20,7 @@ router.get("/", getProducts);
 router.post("/", createProduct);
 router.get("/:id", getSingleProduct);
 router.get("/filter", getProductsByFilters);
-router.post("/search", searchProducts);
+router.post("/search", searchProduct);
 router.get("/bestselling", bestSellingProducts);;
 router.put("/:id", updateProduct);
 router.delete("/:id", deleteProduct);

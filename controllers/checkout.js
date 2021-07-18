@@ -16,7 +16,7 @@ const checkout = orderType => {
       partner_bank_id,
       partner_id,
       amount,
-      move_id,
+      payment_type,
       payment_method_id,
       currency_id,
     } = req.body;
@@ -26,8 +26,7 @@ const checkout = orderType => {
       !amount ||
       !partner_type ||
       !partner_bank_id ||
-      !payment_method_id ||
-      !currency_id
+      !payment_method_id
     ) {
       return await feedBack.failed(res, 400, "Missing required body!", null);
     }

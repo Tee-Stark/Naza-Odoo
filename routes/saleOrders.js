@@ -13,5 +13,5 @@ router.post("/", createSaleOrder);
 router.get("/", getAllSaleOrders);
 router.get("/:id", getSaleOrderById);
 router.delete("/:id", deleteSaleOrer);
-//router.post("/checkout", authorize, checkoutSaleOrder);
+router.post("/checkout", checkoutSaleOrder);
 module.exports = router;

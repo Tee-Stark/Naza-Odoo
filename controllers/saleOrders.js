@@ -1,5 +1,6 @@
 const odoo = require("../config/odoo");
 const feedBack = require("../handler/feedbackHandler.js");
+const checkout = require("./checkout");
 
 // create new sale order -- a sale order gets most of its properties from the purchase order made by the customer
 const createSaleOrder = async (req, res) => {
@@ -75,9 +76,13 @@ const deleteSaleOrer = async (req, res) => {
 };
 
 //checkout an order
+const checkoutSaleOrder = async (req, res) => {
+  return checkout("sale");
+}
 module.exports = {
   createSaleOrder,
   getSaleOrderById,
   getAllSaleOrders,
   deleteSaleOrer,
+  checkoutSaleOrder
 };

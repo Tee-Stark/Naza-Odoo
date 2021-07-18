@@ -5,17 +5,16 @@ const message = {
 }
 
 class feedbackHandler {
-  success(res, code, msg, data = {}) {
-    console.log(data);
-    return res.status(code).json({
+  async success(res, code, msg, data = {}) {
+    return await res.status(code).json({
       status: msg || message.SUCCESS,
-      data,
-    });
+      data: await data,
+    })
   }
-  failed(res, code, msg, err = {}) {
+  async failed(res, code, msg, err = {}) {
     console.error(err); // only send the error message to the client, stack to the console
-    return res.status(code).json({
-      status: message.FAILED,
+    return await res.status(code).json({
+      status: `${code}, ${message.FAILED}: ${msg}`,
       error: `${err !== null ? err.message : msg}`
     });
   }

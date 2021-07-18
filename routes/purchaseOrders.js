@@ -6,13 +6,13 @@ const {
   getPurchaseOrderById,
   getUserPurchaseOrders,
   deletePurchaseOrder,
-  //checkoutPurchaseOrder,
+  checkoutPurchaseOrder,
 } = require("../controllers/purchaseOrders");
 
 router.post("/:id/create", createPurchaseOrder);
 router.get("/:id/show", getPurchaseOrderById);
 router.get("/:id", getUserPurchaseOrders);
 router.delete("/:id", deletePurchaseOrder)
-//router.post("/checkout", authorize, checkoutPurchaseOrder);
+router.post("/checkout", checkoutPurchaseOrder);
 
 module.exports = router;

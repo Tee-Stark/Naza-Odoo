@@ -136,18 +136,18 @@ const getRelatedProducts = async (req, res) => {
   try {
     const result1 = await odoo.read(
       "product.product",
-      ["id", "=", id],
+      ["id", "=", parseInt(id)],
       ["categ_id"]
     );
-    const category = await odoo.searchRead("products.products", {categ_id: result1}, fields);
-    if (!result) {
+    const category = await odoo.searchRead("products.category", ["id", "=", parseInt(result1.categ_id)], fields);
+    if (!category) {
       return await feedBack.failed(res, 404, "Invalid product category", null);
     }
     await feedBack.success(
       res,
       200,
       "Related products returned successfully!",
-      result
+      category
     );
   } catch (error) {
     await feedBack.failed(res, 500, error.message, error);
@@ -250,7 +250,7 @@ const bestSellingProducts = async (req, res) => {
   }
 };
 //search for products
-const searchProducts = async (req, res) => {
+const searchProduct = async (req, res) => {
   const name = req.body;
   if (!name) {
     return await feedBack.failed(
@@ -262,10 +262,11 @@ const searchProducts = async (req, res) => {
   }
   try {
     const searchResults = await odoo.searchRead("product.product", [
-      "name",
+      ["name",
       "ilike",
-      name
-    ]);
+      `${name}`],
+      ["id", "=", 8759]
+    ], ["name", "price"]);
     if (!searchResults) {
       return await feedBack.failed(res, 404, "No results!", null);
     }
@@ -321,6 +322,6 @@ module.exports = {
   getRelatedProducts,
   getCategories,
   bestSellingProducts,
-  searchProducts,
+  searchProduct,
   getProductsByCategory,
 };
