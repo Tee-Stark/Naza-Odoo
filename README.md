@@ -12,7 +12,7 @@ The API documentation is available [here](https://documenter.getpostman.com/view
 #### Step 1: clone the repository
 
 ```bash
-git clone https://github.com/STEP-ABI/ODOO.git
+git clone https://github.com/Tee-Stark/Naza-Odoo.git
 cd ODOO
 ```
 
