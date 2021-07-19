@@ -8,8 +8,8 @@ const {
      getTransactionsByCustomer
 } = require("../controllers/transactions");
 
-router.get("/", getTransactions);
-router.get("/:id", getTransactionById);
-router.get("/partners/:id", getTransactionsByCustomer);
+router.get("/", authorize, getTransactions);
+router.get("/:id", authorize, getTransactionById);
+router.get("/partners/:id",authorize, getTransactionsByCustomer);
 
 module.exports = router;

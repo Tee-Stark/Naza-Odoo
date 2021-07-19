@@ -1,5 +1,5 @@
 const express = require("express");
-const auth = require("../middlewares/auth");
+const authorize = require("../middlewares/auth");
 const router = express.Router();
 const {
   getProducts,
@@ -17,15 +17,15 @@ const {
 } = require("../controllers/products");
 
 router.get("/", getProducts);
-router.post("/", createProduct);
+router.post("/", authorize, createProduct);
 router.get("/:id", getSingleProduct);
 router.get("/filter", getProductsByFilters);
 router.post("/search", searchProduct);
 router.get("/bestselling", bestSellingProducts);;
-router.put("/:id", updateProduct);
-router.delete("/:id", deleteProduct);
+router.put("/:id", authorize, updateProduct);
+router.delete("/:id", authorize, deleteProduct);
 router.get("/:id/related", getRelatedProducts);
-router.post("/categories/create", addCategory);
+router.post("/categories/create", authorize, addCategory);
 router.get("/categories", getCategories);
 router.get("/categories/:id", getProductsByCategory);
 

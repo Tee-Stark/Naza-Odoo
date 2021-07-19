@@ -9,9 +9,9 @@ const {
   } = require("../controllers/saleOrders");
 const authorize = require("../middlewares/auth");
 
-router.post("/", createSaleOrder);
-router.get("/", getAllSaleOrders);
-router.get("/:id", getSaleOrderById);
-router.delete("/:id", deleteSaleOrer);
-router.post("/checkout", checkoutSaleOrder);
+router.post("/", authorize, createSaleOrder);
+router.get("/", authorize, getAllSaleOrders);
+router.get("/:id", authorize, getSaleOrderById);
+router.delete("/:id", authorize, deleteSaleOrer);
+router.post("/checkout", authorize, checkoutSaleOrder);
 module.exports = router;
