@@ -65,11 +65,14 @@ const getCustomerById = async (req, res) => {
     ? req.query.fields.split(",")
     : ["name"];
   try {
-    const result = await odoo.read("res.users", parseInt(id), fields);
-    return await feedBack.success(
+    const result = await odoo.read("res.users", [parseInt(id)], fields);
+    if(!result || result.length === 0) {
+      return feedBack.failed(res, 404, "User does not exist!", null);
+    }
+    await feedBack.success(
       res,
       200,
-      "Customers returned successfully!",
+      "Customer returned successfully!",
       result
     );
   } catch (error) {
