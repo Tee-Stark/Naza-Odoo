@@ -79,7 +79,7 @@ const getCustomerById = async (req, res) => {
 // to get all customers
 const getAllCustomers = async (req, res) => {
   try {
-    const result = await odoo.read("res.users", []);
+    const result = await odoo.read("res.users");
     if (!result) {
       return await feedBack.failed(res, 404, "No record found", null);
     }
@@ -98,7 +98,7 @@ const updateCustomer = async (req, res) => {
   const id = req.params.id;
   const updates = req.body;
   try {
-    const result = await odoo.update("res.users", parseInt(id), updates);
+    let result = await odoo.update("res.users", [parseInt(id)], updates);
     if (!result) {
       return await feedBack.failed(
         res,
@@ -107,6 +107,7 @@ const updateCustomer = async (req, res) => {
         null
       );
     }
+    result = await odoo.read("res.users", [parseInt(id)], ["name", "login"]);
     await feedBack.success(
       res,
       200,
@@ -114,7 +115,7 @@ const updateCustomer = async (req, res) => {
       result
     );
   } catch (error) {
-    await feedBack(res, 500, error.message, error);
+    await feedBack.failed(res, 500, error.message, error);
   }
 };
 //to delete a customer
