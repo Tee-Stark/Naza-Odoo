@@ -18,7 +18,7 @@ const createCustomer = async (req, res) => {
     // return success
     await feedBack.success(res, 200, "Signup successful!", {
       user_id: user_id,
-      token: generateToken(user_id)
+      token: await generateToken(user_id)
     });
   } catch (error) {
     await feedBack.failed(res, 500, error.message, error);
@@ -49,7 +49,7 @@ const loginCustomer = async (req, res) => {
         "Customer signed in successfully",
         {
           user,
-          token: generateToken(user[0].id),
+          token: await generateToken(user[0].id),
         }
       );
     }
