@@ -6,18 +6,18 @@ const querystring = require("querystring");
 // get all products
 const getProducts = async (req, res) => {
   // get `fields` query params e.g /products?fields=name,price
-  const fields = req.query.fields ? req.query.fields.split(",") : ["name"];
+  const fields = req.query.fields ? req.query.fields.split(",") : ["name", "pricelist_id"];
 
   console.log(`Fields => ${fields}`);
   try {
-    const result = await odoo.searchRead("product.product", undefined, fields, {
-      limit: 5,
-      offset: 10,
+    const result = await odoo.searchRead("product.product", {}, fields, {
+      limit: 25,
+      offset: 30,
     });
     if (!result) {
       return await feedBack.failed(res, 400, "Unable to get products", null);
     }
-    await feedBack.success(res, 200, "Products returned successfully!");
+    await feedBack.success(res, 200, "Products returned successfully!", result);
   } catch (error) {
     await feedBack.failed(res, 500, error.message, error);
   }
@@ -223,7 +223,6 @@ const bestSellingProducts = async (req, res) => {
   const fields = req.query.fields
     ? req.query.fields.split(",")
     : ["name", "standard_price"];
-  console.log(`Fields => ${fields}`);
   try {
     /*const order_ids = await odoo.searchRead(
       "purchase.order",
@@ -274,7 +273,7 @@ const searchProduct = async (req, res) => {
     const searchResults = await odoo.searchRead(
       "product.product",
       ["name", "ilike", `${name}`],
-      ["name", "price"]
+      ["name", "price", "pricelist_id"]
     );
     if (!searchResults) {
       return await feedBack.failed(res, 404, "No results!", null);
