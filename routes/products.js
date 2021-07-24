@@ -17,15 +17,15 @@ const {
 } = require("../controllers/products");
 
 router.get("/", getProducts);
-router.post("/", authorize, createProduct);
+router.post("/", createProduct);
 router.get("/:id", getSingleProduct);
-router.get("/filter", getProductsByFilters);
+router.post("/filter", getProductsByFilters);
 router.post("/search", searchProduct);
 router.get("/bestselling", bestSellingProducts);;
-router.put("/:id", authorize, updateProduct);
-router.delete("/:id", authorize, deleteProduct);
+router.put("/:id", updateProduct);
+router.delete("/:id", deleteProduct);
 router.get("/:id/related", getRelatedProducts);
-router.post("/categories/create", authorize, addCategory);
+router.post("/categories/create", addCategory);
 router.get("/categories", getCategories);
 router.get("/categories/:id", getProductsByCategory);
 
