@@ -29,7 +29,7 @@ const getTransactions = async (req, res) => {
   //const fields = req.query.fields;
   const fields = req.query.fields
     ? req.query.fields.split(",")
-    : ["partner_id", "amount", "payment_method_id"];
+    : ["partner_id", "amount", "payment_method_id", "payment_type", "currency_id"];
 
   //console.log(`Fields => ${fields}`);
   try {
