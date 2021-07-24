@@ -66,6 +66,7 @@ const createProduct = async (req, res) => {
       price,
       uom_id,
       uom_po_id,
+      pricelist_id: 3
     });
     if (result) {
       return await feedBack.success(
