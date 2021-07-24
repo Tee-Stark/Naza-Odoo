@@ -5,14 +5,13 @@ const {
   createPurchaseOrder,
   getPurchaseOrderById,
   getUserPurchaseOrders,
-  deletePurchaseOrder,
-  checkoutPurchaseOrder,
+  deletePurchaseOrder
 } = require("../controllers/purchaseOrders");
 
-router.post("/:id/create", authorize, createPurchaseOrder);
-router.get("/:id/show", authorize, getPurchaseOrderById);
-router.get("/:id", authorize, getUserPurchaseOrders);
+router.post("/:id/create", createPurchaseOrder);
+router.get("/:id/show", getPurchaseOrderById);
+router.get("/:id", getUserPurchaseOrders);
 router.delete("/:id", authorize, deletePurchaseOrder)
-router.post("/checkout", authorize, checkoutPurchaseOrder);
+
 
 module.exports = router;
