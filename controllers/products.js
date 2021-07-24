@@ -140,12 +140,12 @@ const getRelatedProducts = async (req, res) => {
   try {
     const result = await odoo.read(
       "product.product",
-      ["id", "=", parseInt(id)],
-      ["categ_id"]
+      parseInt(id), ["categ_id"]
     );
+    console.log(result);
     const category = await odoo.searchRead(
-      "product.category",
-      ["id", "=", parseInt(result.categ_id)],
+      "product.product",
+      ["categ_id", "=", parseInt(result[0].categ_id)],
       fields
     );
     if (!category) {
