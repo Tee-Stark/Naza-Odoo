@@ -11,6 +11,7 @@ const customers = require("./routes/customers");
 const transactions = require("./routes/transactions");
 const purchaseOrders = require("./routes/purchaseOrders");
 const saleOrders = require("./routes/saleOrders");
+const posOrders = require("./routes/posOrder");
 // middlewares
 const errorHandler = require("./middlewares/errorHandler");
 const notFound = require("./middlewares/notFound");
@@ -31,6 +32,7 @@ app.use("/api/customers", customers);
 app.use("/api/transactions", transactions) 
 app.use("/api/orders/purchase", purchaseOrders);
 app.use("/api/orders/sale", saleOrders);
+app.use("/api/pos/", posOrders);
 // error handlers
 app.use(notFound);
 app.use(errorHandler);
