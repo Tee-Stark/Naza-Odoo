@@ -21,7 +21,7 @@ router.post("/", createProduct);
 router.get("/:id", getSingleProduct);
 router.post("/filter", getProductsByFilters);
 router.post("/search", searchProduct);
-router.get("/bestselling", bestSellingProducts);;
+router.post("/bestselling", bestSellingProducts);;
 router.put("/:id", updateProduct);
 router.delete("/:id", deleteProduct);
 router.get("/:id/related", getRelatedProducts);
