@@ -6,7 +6,9 @@ const querystring = require("querystring");
 // get all products
 const getProducts = async (req, res) => {
   // get `fields` query params e.g /products?fields=name,price
-  const fields = req.query.fields ? req.query.fields.split(",") : ["name", "pricelist_id"];
+  const fields = req.query.fields
+    ? req.query.fields.split(",")
+    : ["name", "pricelist_id", "image"];
 
   console.log(`Fields => ${fields}`);
   try {
@@ -31,11 +33,11 @@ const getProductsByFilters = async (req, res) => {
   try {
     filters = querystring.parse(filterQuery);
     console.log(filters);
-    const products = await odoo.searchRead(
-      "product.product",
-      filters,
-      ["name", "price"]
-    );
+    const products = await odoo.searchRead("product.product", filters, [
+      "name",
+      "price",
+      "image"
+    ]);
     if (!products || products.length === 0) {
       return await feedBack.failed(
         res,
@@ -53,7 +55,18 @@ const getProductsByFilters = async (req, res) => {
 // /products `POST`
 // create new product
 const createProduct = async (req, res) => {
-  const { name, type, categ_id, price, uom_id, uom_po_id } = req.body;
+  const {
+    name,
+    type,
+    image,
+    image_small,
+    image_medium,
+    categ_id,
+    price,
+    uom_id,
+    uom_po_id,
+  } = req.body;
+  //images aren't so important so we don't check for their validity yet...
   if (!name || !type || !categ_id || !price || !uom_id || !uom_po_id) {
     return await feedBack.failed(res, 400, "Missing required body!", null);
   }
@@ -66,7 +79,10 @@ const createProduct = async (req, res) => {
       price,
       uom_id,
       uom_po_id,
-      pricelist_id: 3
+      pricelist_id: 3,
+      image,
+      image_small,
+      image_medium,
     });
     if (result) {
       return await feedBack.success(
@@ -89,7 +105,7 @@ const getSingleProduct = async (req, res) => {
   const id = req.params.id;
   const fields = req.query.fields
     ? req.query.fields.split(",")
-    : ["name", "categ_id"];
+    : ["name", "categ_id", "image", "image_small", "image_medium"];
   try {
     const result = await odoo.searchRead(
       "product.product",
@@ -137,12 +153,11 @@ const getRelatedProducts = async (req, res) => {
   const id = req.params.id;
   const fields = req.query.fields
     ? req.query.fields.split(",")
-    : ["name", "price"];
+    : ["name", "price", "image"];
   try {
-    const result = await odoo.read(
-      "product.product",
-      parseInt(id), ["categ_id"]
-    );
+    const result = await odoo.read("product.product", parseInt(id), [
+      "categ_id",
+    ]);
     console.log(result);
     const category = await odoo.searchRead(
       "product.product",
@@ -274,7 +289,7 @@ const searchProduct = async (req, res) => {
     const searchResults = await odoo.searchRead(
       "product.product",
       ["name", "ilike", `${name}`],
-      ["name", "price", "pricelist_id"]
+      ["name", "price", "pricelist_id", "image_1920"]
     );
     if (!searchResults) {
       return await feedBack.failed(res, 404, "No results!", null);
@@ -294,7 +309,7 @@ const getProductsByCategory = async (req, res) => {
   const category_id = req.params.id;
   const fields = req.query.fields
     ? req.query.fields.split(",")
-    : ["name", "type"];
+    : ["name", "type", "image_1920"];
   try {
     const products = await odoo.searchRead(
       "product.product",
@@ -319,6 +334,7 @@ const getProductsByCategory = async (req, res) => {
     await feedBack.failed(res, 500, error.message, error);
   }
 };
+
 module.exports = {
   getProducts,
   getProductsByFilters,
