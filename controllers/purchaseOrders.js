@@ -1,20 +1,11 @@
 //view purchase orders
 const odoo = require("../config/odoo");
 const feedBack = require("../handler/feedbackHandler");
-const checkout = require("./checkout.js");
-const {checkoutOrder} = require("./checkout.js");
 //create a new purchase order
 const createPurchaseOrder = async (req, res) => {
-  const { name, partner_id, amount_total, product_id } =
-    req.body;
+  const { name, partner_id, amount_total, product_id } = req.body;
   const user_id = req.params.id;
-  if (
-    !user_id ||
-    !name ||
-    !partner_id ||
-    !amount_total ||
-    !product_id 
-  ) {
+  if (!user_id || !name || !partner_id || !amount_total || !product_id) {
     return await feedBack.failed(res, 400, "Missing required body!", null);
   }
   try {
@@ -27,7 +18,12 @@ const createPurchaseOrder = async (req, res) => {
       //company_id,
     });
     if (!order_id) {
-      return await feedBack.failed(res, 400, "Unable to create purchase order!", null);
+      return await feedBack.failed(
+        res,
+        400,
+        "Unable to create purchase order!",
+        null
+      );
     }
     await feedBack.success(
       res,
@@ -48,7 +44,12 @@ const getPurchaseOrderById = async (req, res) => {
     if (!result) {
       return await feedBack.failed(res, 404, "Order not found!", null);
     }
-    await feedBack.success(res, 200, "Purchase Order returned successfully!", result);
+    await feedBack.success(
+      res,
+      200,
+      "Purchase Order returned successfully!",
+      result
+    );
   } catch (error) {
     await feedBack.failed(res, 500, error.message, error);
   }
@@ -66,7 +67,12 @@ const getUserPurchaseOrders = async (req, res) => {
       fields
     );
     if (!result) {
-      return await feedBack.failed(res, 404, "Customer orders not found!", null);
+      return await feedBack.failed(
+        res,
+        404,
+        "Customer orders not found!",
+        null
+      );
     }
     await feedBack.success(
       res,
@@ -87,21 +93,21 @@ const deletePurchaseOrder = async (req, res) => {
     if (!result) {
       return await feedBack.failed(res, 400, "Order not deleted!", null);
     }
-    await feedBack.success(res, 200, "Purchase Order deleted successfully!", result);
+    await feedBack.success(
+      res,
+      200,
+      "Purchase Order deleted successfully!",
+      result
+    );
   } catch (error) {
     await feedBack.failed(res, 500, error.message, error);
   }
 };
 
-//checkout and pay for purchase
-const checkoutPurchaseOrder = async (req, res) => {
-  return checkout("purchase");
-};
 
 module.exports = {
   createPurchaseOrder,
   getPurchaseOrderById,
   getUserPurchaseOrders,
-  deletePurchaseOrder,
-  checkoutPurchaseOrder
+  deletePurchaseOrder
 };
