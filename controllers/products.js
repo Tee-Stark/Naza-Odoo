@@ -36,7 +36,7 @@ const getProductsByFilters = async (req, res) => {
     const products = await odoo.searchRead("product.product", filters, [
       "name",
       "price",
-      "image"
+      "image",
     ]);
     if (!products || products.length === 0) {
       return await feedBack.failed(
@@ -238,25 +238,14 @@ const bestSellingProducts = async (req, res) => {
   // get `fields` query params e.g /products?fields=name,price
   const fields = req.query.fields
     ? req.query.fields.split(",")
-    : ["name", "standard_price"];
+    : ["name", "standard_price", "sales_count"];
   try {
-    /*const order_ids = await odoo.searchRead(
-      "purchase.order",
-      ["sale_order_count", ">", 5],
-      ["id"]
-    );*/
-    //console.log(order_ids);
-    let results = [];
-    //order_ids.forEach(async (id) => {
-    //console.log(id);
-    const result = await odoo.read(
-      "purchase.order",
-      [parseInt(id)],
-      ["product_id"]
+    const result = await odoo.searchRead(
+      "product.product",
+      ["sales_count", ">", 15],
+      fields
     );
-    results.push(result);
-    // });
-    if (!results) {
+    if (!result || result.length <= 0) {
       return await feedBack.failed(
         res,
         404,
