@@ -25,13 +25,17 @@ const getProducts = async (req, res) => {
 //get products by filter
 const getProductsByFilters = async (req, res) => {
   const filterQuery = req.url.split("?")[1];
-  if (!filters) {
+  if (!filterQuery) {
     return res.status(308).redirect("/api/products");
   }
   try {
     filters = querystring.parse(filterQuery);
     console.log(filters);
-    const products = await odoo.searchRead("product.product", filters);
+    const products = await odoo.searchRead(
+      "product.product",
+      [filters],
+      ["name", "price"]
+    );
     if (!products || products.length === 0) {
       return await feedBack.failed(
         res,
@@ -134,12 +138,16 @@ const getRelatedProducts = async (req, res) => {
     ? req.query.fields.split(",")
     : ["name", "price"];
   try {
-    const result1 = await odoo.read(
+    const result = await odoo.read(
       "product.product",
       ["id", "=", parseInt(id)],
       ["categ_id"]
     );
-    const category = await odoo.searchRead("products.category", ["id", "=", parseInt(result1.categ_id)], fields);
+    const category = await odoo.searchRead(
+      "product.category",
+      ["id", "=", parseInt(result.categ_id)],
+      fields
+    );
     if (!category) {
       return await feedBack.failed(res, 404, "Invalid product category", null);
     }
@@ -225,12 +233,14 @@ const bestSellingProducts = async (req, res) => {
     //console.log(order_ids);
     let results = [];
     //order_ids.forEach(async (id) => {
-      //console.log(id);
-      const result = await odoo.read("purchase.order", [parseInt(id)], [
-        "product_id",
-      ]);
-      results.push(result);
-   // });
+    //console.log(id);
+    const result = await odoo.read(
+      "purchase.order",
+      [parseInt(id)],
+      ["product_id"]
+    );
+    results.push(result);
+    // });
     if (!results) {
       return await feedBack.failed(
         res,
@@ -251,7 +261,7 @@ const bestSellingProducts = async (req, res) => {
 };
 //search for products
 const searchProduct = async (req, res) => {
-  const name = req.body;
+  const { name } = req.body;
   if (!name) {
     return await feedBack.failed(
       res,
@@ -261,12 +271,11 @@ const searchProduct = async (req, res) => {
     );
   }
   try {
-    const searchResults = await odoo.searchRead("product.product", [
-      ["name",
-      "ilike",
-      `${name}`],
-      ["id", "=", 8759]
-    ], ["name", "price"]);
+    const searchResults = await odoo.searchRead(
+      "product.product",
+      ["name", "ilike", `${name}`],
+      ["name", "price"]
+    );
     if (!searchResults) {
       return await feedBack.failed(res, 404, "No results!", null);
     }
@@ -274,7 +283,7 @@ const searchProduct = async (req, res) => {
       res,
       200,
       "Search results returned successfully!",
-      searchResults
+      await searchResults
     );
   } catch (error) {
     await feedBack.failed(res, 500, error.message, error);
