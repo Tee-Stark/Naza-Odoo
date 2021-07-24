@@ -33,7 +33,7 @@ const getProductsByFilters = async (req, res) => {
     console.log(filters);
     const products = await odoo.searchRead(
       "product.product",
-      [filters],
+      filters,
       ["name", "price"]
     );
     if (!products || products.length === 0) {
