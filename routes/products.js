@@ -30,7 +30,7 @@ router.delete("/:id", deleteProduct);
 router.get("/:id/reviews", getProductReviews);
 router.get("/:id/related", getRelatedProducts);
 router.post("/categories/create", addCategory);
-router.get("/categories", getCategories);
+router.post("/categories", getCategories);
 router.get("/categories/:id", getProductsByCategory);
 
 module.exports = router;
