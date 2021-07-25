@@ -14,6 +14,8 @@ const {
   bestSellingProducts,
   searchProduct,
   getProductsByCategory,
+  getProductReviews,
+  //giveReview,
 } = require("../controllers/products");
 
 router.get("/", getProducts);
@@ -24,6 +26,8 @@ router.post("/search", searchProduct);
 router.post("/bestselling", bestSellingProducts);;
 router.put("/:id", updateProduct);
 router.delete("/:id", deleteProduct);
+//router.post("/reviews", giveReview)
+router.get("/:id/reviews", getProductReviews);
 router.get("/:id/related", getRelatedProducts);
 router.post("/categories/create", addCategory);
 router.get("/categories", getCategories);

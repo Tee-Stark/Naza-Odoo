@@ -233,16 +233,16 @@ const updateProduct = async (req, res) => {
   }
 };
 
-// best selling products --> a bst sellimg product is one with more than 5 sale orders
+// best selling products --> assuming a best sellimg product is one with more than 30 sales
 const bestSellingProducts = async (req, res) => {
   // get `fields` query params e.g /products?fields=name,price
   const fields = req.query.fields
     ? req.query.fields.split(",")
-    : ["name", "standard_price", "sales_count"];
+    : ["name", "standard_price"];
   try {
     const result = await odoo.searchRead(
       "product.product",
-      ["sales_count", ">", 15],
+      [["sales_count", ">", 30]],
       fields
     );
     if (!result || result.length <= 0) {
@@ -278,7 +278,7 @@ const searchProduct = async (req, res) => {
     const searchResults = await odoo.searchRead(
       "product.product",
       ["name", "ilike", `${name}`],
-      ["name", "price", "pricelist_id", "image_1920"]
+      ["name", "price", "pricelist_id", "image"]
     );
     if (!searchResults) {
       return await feedBack.failed(res, 404, "No results!", null);
@@ -323,6 +323,48 @@ const getProductsByCategory = async (req, res) => {
     await feedBack.failed(res, 500, error.message, error);
   }
 };
+/*
+//to review a product
+const giveReview = async (req, res) => {
+  const {
+    res_id,
+    res_model,
+    rating,
+    feedback
+  } = req.body;
+  try {
+    const result = await odoo.create("rating.rating", {
+      res_id,
+      res_model,
+      rating,
+      feedback
+    });
+    if(!result) {
+      return await feedBack.failed(res, 500, "Unable to review product", null);
+    }
+    await feedBack.success(res, 200, "Successfully reviewed product!", result);
+  } catch (error) {
+    await feedBack.failed(res, 500, error.message, error);
+  }
+}
+*/
+//to get all product's reviews
+const getProductReviews = async (req, res) => {
+  const id = req.params.id;
+  try {
+    const reviews = await odoo.searchRead(
+      "rating.rating",
+      { res_model: "product.product", res_id: parseInt(id) },
+      ["res_name", "rating", "rating_text", "feedback"]
+    );
+    if(!reviews || reviews.length <=0) {
+      return await feedBack.failed(res, 404, "No reviews for this product yet!", null);
+    }
+    await feedBack.success(res, 200, "Reviews returned successfully!", reviews);
+  } catch (error) {
+    await feedBack.failed(res, 500, error.message, error);
+  }
+};
 
 module.exports = {
   getProducts,
@@ -338,4 +380,6 @@ module.exports = {
   bestSellingProducts,
   searchProduct,
   getProductsByCategory,
+  getProductReviews,
+  //giveReview
 };
