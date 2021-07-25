@@ -5,9 +5,7 @@ const odoo = new Odoo({
   db: "metricinternet-pricepoint-test-2753246",
   port: 80,
   username: process.env.ODOO_USERNAME,
-  //username: "kolade@abi-ng.com",
   password: process.env.ODOO_PASSWORD,
-  //password: "Password@123"
 });
 
 odoo
