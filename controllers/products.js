@@ -181,7 +181,7 @@ const getRelatedProducts = async (req, res) => {
 // return all category IDs
 const getCategories = async (req, res) => {
   // get `fields` query params e.g /products?fields=name,price
-  const fields = req.query.fields ? req.query.fields.split(",") : ["categ_id"];
+  const fields = req.query.fields ? req.query.fields.split(",") : ["name", "complete_name", "product_count"];
 
   console.log(`Fields => ${fields}`);
   try {
