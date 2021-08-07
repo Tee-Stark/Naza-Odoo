@@ -1,7 +1,7 @@
 //mongodb+srv://OdooAPI:<password>@cluster0.qytxo.mongodb.net/myFirstDatabase?retryWrites=true&w=majority
 const mongoose = require('mongoose');
 require("dotenv").config();
-//const { MONGOLAB_URI, API_PORT } = process.env;
+const { MONGOLAB_URI } = process.env;
 
 mongoose.Promise = global.Promise;
 

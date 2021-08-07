@@ -1,20 +1,27 @@
 const odoo = require("../config/odoo");
 const feedBack = require("../handler/feedbackHandler.js");
-//const bcrypt = require("bcryptjs");
+const bcrypt = require("bcryptjs");
 const generateToken = require("../handler/authHandler.js");
+const customer = require("../models/customer");
 // create a new customer
 const createCustomer = async (req, res) => {
   let { name, login, password } = req.body;
-  if (name || !login || !password) {
+  if (!name || !login || !password) {
     // return error
     return await feedBack.failed(res, 400, "Missing required fields!", null);
   }
   try {
+    const hash = await bcrypt.hash(password, 12);
+    password = hash;
     const user_id = await odoo.create("res.users", {
      name,
      login,
      password
     });
+    const record = await customer.create({ login, password });
+    if(!record){
+      return feedBack.failed(res, 400, "Could not save Customer login details! Pls try again...")
+    }
     // return success
     await feedBack.success(res, 200, "Signup successful!", {
       user_id: user_id,
@@ -37,21 +44,27 @@ const loginCustomer = async (req, res) => {
     );
   }
   try {
-    const user = await odoo.searchRead(
-      "res.users",
-      { login: login, password: password },
-      ["id", "name", "login"]
-    );
-    if (user) {
-      return await feedBack.success(
-        res,
-        202,
-        "Customer signed in successfully",
-        {
-          user,
-          token: await generateToken(user[0].id),
-        }
+    const verified = await customer.findOne({ login: login });
+    const correctPwd = await bcrypt.compare(password, verified.password);
+    if(verified && correctPwd) {
+      const user = await odoo.searchRead(
+        "res.users",
+        { login: login, password: password },
+        ["id", "name", "login"]
       );
+      if (user) {
+        return await feedBack.success(
+          res,
+          202,
+          "Customer signed in successfully",
+          {
+            user,
+            token: await generateToken(user[0].id),
+          }
+        );
+      }
+    } else {
+      return await feedBack.failed(res, 404, "Invalid login credentials", null);
     }
   } catch (error) {
     await feedBack.failed(res, 500, error.mesage, error);

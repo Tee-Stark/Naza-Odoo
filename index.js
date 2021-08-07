@@ -2,7 +2,7 @@ const express = require("express");
 const logger = require("morgan");
 const cors = require("cors");
 const helmet = require("helmet");
-//require('./config/db');
+require('./config/db');
 require("dotenv").config();
 
 // routes
