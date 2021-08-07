@@ -4,16 +4,16 @@ const feedBack = require("../handler/feedbackHandler.js");
 const generateToken = require("../handler/authHandler.js");
 // create a new customer
 const createCustomer = async (req, res) => {
-  let { firstname, lastname, login, password } = req.body;
-  if (!firstname || !lastname || !login || !password) {
+  let { name, login, password } = req.body;
+  if (name || !login || !password) {
     // return error
     return await feedBack.failed(res, 400, "Missing required fields!", null);
   }
   try {
     const user_id = await odoo.create("res.users", {
-      name: firstname + lastname,
-      login: login,
-      password: password,
+     name,
+     login,
+     password
     });
     // return success
     await feedBack.success(res, 200, "Signup successful!", {
