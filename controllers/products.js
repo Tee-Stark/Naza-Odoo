@@ -150,7 +150,9 @@ const getSingleProduct = async (req, res) => {
       "product.product",
       {
         id: parseInt(id),
-      });
+      },
+      fields
+      );
     if (!result) {
       return await feedBack.failed(res, 404, "Product does not exist!", null);
     }
