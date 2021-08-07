@@ -8,7 +8,18 @@ const getProducts = async (req, res) => {
   // get `fields` query params e.g /products?fields=name,price
   const fields = req.query.fields
     ? req.query.fields.split(",")
-    : ["name", "pricelist_id", "image"];
+    : [
+        "name",
+        "categ_id",
+        "uom_id",
+        "image",
+        "image_small",
+        "image_medium",
+        "color",
+        "display_name",
+        "location_id",
+        "rating_count",
+      ];
 
   console.log(`Fields => ${fields}`);
   try {
@@ -105,13 +116,41 @@ const getSingleProduct = async (req, res) => {
   const id = req.params.id;
   const fields = req.query.fields
     ? req.query.fields.split(",")
-    : ["name", "categ_id", "image", "image_small", "image_medium"];
+    : [
+        "name",
+        "categ_id",
+        "uom_id",
+        "uom_po_id",
+        "image",
+        "image_small",
+        "image_medium",
+        "product_image_ids",
+        "description",
+        "color",
+        "rating_ids",
+        "product_variant_id",
+        "valid_existing_variant_ids",
+        "product_template_attribute_value_ids",
+        "alternative_product_ids",
+        "seller_ids",
+        "create_date",
+        "qty_available",
+        "display_name",
+        "__last_update",
+        "location_id",
+        "rating_count",
+        "rating_last_value",
+        "rating_last_feedback",
+        "has_discounted_amount",
+        "sales_count",
+        "taxes_id",
+      ];
   try {
     const result = await odoo.searchRead(
       "product.product",
-      { id: parseInt(id) },
-      fields
-    );
+      {
+        id: parseInt(id),
+      });
     if (!result) {
       return await feedBack.failed(res, 404, "Product does not exist!", null);
     }
@@ -181,7 +220,9 @@ const getRelatedProducts = async (req, res) => {
 // return all category IDs
 const getCategories = async (req, res) => {
   // get `fields` query params e.g /products?fields=name,price
-  const fields = req.query.fields ? req.query.fields.split(",") : ["name", "complete_name", "product_count"];
+  const fields = req.query.fields
+    ? req.query.fields.split(",")
+    : ["name", "complete_name", "product_count"];
 
   console.log(`Fields => ${fields}`);
   try {
@@ -357,8 +398,13 @@ const getProductReviews = async (req, res) => {
       { res_model: "product.product", res_id: parseInt(id) },
       ["res_name", "rating", "rating_text", "feedback"]
     );
-    if(!reviews || reviews.length <=0) {
-      return await feedBack.failed(res, 404, "No reviews for this product yet!", null);
+    if (!reviews || reviews.length <= 0) {
+      return await feedBack.failed(
+        res,
+        404,
+        "No reviews for this product yet!",
+        null
+      );
     }
     await feedBack.success(res, 200, "Reviews returned successfully!", reviews);
   } catch (error) {
