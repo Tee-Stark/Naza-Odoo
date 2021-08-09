@@ -13,6 +13,10 @@ const createCustomer = async (req, res) => {
   try {
     const hash = await bcrypt.hash(password, 12);
     password = hash;
+    const check_exists = await odoo.search("res.users", {login: login});
+    if(check_exists.length > 0) {
+      return await feedBack.failed(res, 400, "User already exists! Pls use another e-mail...", null);
+    }
     const user_id = await odoo.create("res.users", {
      name,
      login,
