@@ -3,6 +3,7 @@ const feedBack = require("../handler/feedbackHandler.js");
 const bcrypt = require("bcryptjs");
 const generateToken = require("../handler/authHandler.js");
 const customer = require("../models/customer");
+const feedbackHandler = require("../handler/feedbackHandler.js");
 // create a new customer
 const createCustomer = async (req, res) => {
   let { name, login, password } = req.body;
@@ -13,23 +14,36 @@ const createCustomer = async (req, res) => {
   try {
     const hash = await bcrypt.hash(password, 12);
     password = hash;
-    const check_exists = await odoo.search("res.users", {login: login});
-    if(check_exists.length > 0) {
-      return await feedBack.failed(res, 400, "User already exists! Pls use another e-mail...", null);
+    const check_exists = await odoo.search("res.users", { login: login });
+    if (check_exists.length > 0) {
+      return await feedBack.failed(
+        res,
+        400,
+        "User already exists! Pls use another e-mail...",
+        null
+      );
     }
     const user_id = await odoo.create("res.users", {
-     name,
-     login,
-     password
+      name,
+      login,
+      password,
+      email: login,
+      customer: true,
+      wallet_counts: 1,
+      free_member: true,
     });
     const record = await customer.create({ login, password });
-    if(!record){
-      return feedBack.failed(res, 400, "Could not save Customer login details! Pls try again...")
+    if (!record) {
+      return feedBack.failed(
+        res,
+        400,
+        "Could not save Customer login details! Pls try again..."
+      );
     }
     // return success
     await feedBack.success(res, 200, "Signup successful!", {
       user_id: user_id,
-      token: await generateToken(user_id)
+      token: await generateToken(user_id),
     });
   } catch (error) {
     await feedBack.failed(res, 500, error.message, error);
@@ -50,7 +64,7 @@ const loginCustomer = async (req, res) => {
   try {
     const verified = await customer.findOne({ login: login });
     const correctPwd = await bcrypt.compare(password, verified.password);
-    if(verified && correctPwd) {
+    if (verified && correctPwd) {
       const user = await odoo.searchRead(
         "res.users",
         { login: login, password: password },
@@ -80,18 +94,29 @@ const getCustomerById = async (req, res) => {
   const id = req.params.id;
   const fields = req.query.fields
     ? req.query.fields.split(",")
-    : ["name"];
+    : [
+        "name",
+        "display_name",
+        "email",
+        "phone",
+        "street",
+        "street2",
+        "city",
+        "state_id",
+        "country_id",
+        "zip",
+        "wallet_credits",
+        "membership_type",
+        "subscription_date",
+        "expiry_date",
+        "image",
+      ];
   try {
-    const result = await odoo.read("res.users", [parseInt(id)], fields);
-    if(!result || result.length === 0) {
+    const result = await odoo.read("res.users", [parseInt(id)]);
+    if (!result || result.length === 0) {
       return feedBack.failed(res, 404, "User does not exist!", null);
     }
-    await feedBack.success(
-      res,
-      200,
-      "Customer returned successfully!",
-      result
-    );
+    await feedBack.success(res, 200, "Customer returned successfully!", result);
   } catch (error) {
     await feedBack.failed(res, 500, error.message, error);
   }
@@ -138,6 +163,48 @@ const updateCustomer = async (req, res) => {
     await feedBack.failed(res, 500, error.message, error);
   }
 };
+const subscription = async (req, res) => {
+  const id = req.params.id;
+  const plan = req.body;
+  try {
+    const user = await odoo.searchRead('res.users', {"id": parseInt(id)}, [
+      "name",
+      "subscription_count"
+    ]);
+    const subscribed = await odoo.update("res.users", parseInt(id), {
+      free_member: false,
+      membership_amount: plan.amount,
+      membership_state: "active",
+      membership_start: new Date(),
+      membership_stop: new Date(
+        new Date().setFullYear(new Date().getFullYear() + plan.years)
+      ),
+      membership_type: plan.type,
+      subscription_date: new Date(),
+      expiry_date: new Date(
+        new Date().setFullYear(new Date().getFullYear() + plan.years)
+      ),
+      subscription_count: user[0].subscription_count + 1,
+    });
+    if (!subscribed) {
+      return feedBack.failed(res, 400, "Subscription failed please try again!");
+    }
+    const record = await odoo.searchRead("res.users", { id: parseInt(id) }, [
+      "membership_amount",
+      "membership_type",
+      "subscription_date",
+      "expiry_date",
+    ]);
+    feedBack.success(
+      res,
+      200,
+      `Membership subscription successful! Valid until ${record[0].expiry_date}`,
+      record
+    );
+  } catch (err) {
+    await feedBack.failed(res, 500, err.message, err);
+  }
+};
 //to delete a customer
 const deleteCustomer = async (req, res) => {
   const id = req.params.id;
@@ -158,5 +225,6 @@ module.exports = {
   getCustomerById,
   getAllCustomers,
   updateCustomer,
+  subscription,
   deleteCustomer,
 };
