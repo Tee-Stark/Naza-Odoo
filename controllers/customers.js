@@ -174,7 +174,7 @@ const subscription = async (req, res) => {
     const subscribed = await odoo.update("res.users", parseInt(id), {
       free_member: false,
       membership_amount: plan.amount,
-      membership_state: "active",
+      membership_state: "paid",
       membership_start: new Date(),
       membership_stop: new Date(
         new Date().setFullYear(new Date().getFullYear() + plan.years)
