@@ -164,7 +164,7 @@ const updateCustomer = async (req, res) => {
 };
 const subscription = async (req, res) => {
   const id = req.params.id;
-  const plan = req.body;
+  const plan = req.body; //req.body = type, years and amount paid
   try {
     const user = await odoo.searchRead('res.users', {"id": parseInt(id)}, [
       "name",
