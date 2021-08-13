@@ -1,24 +1,10 @@
 //mongodb+srv://OdooAPI:<password>@cluster0.qytxo.mongodb.net/myFirstDatabase?retryWrites=true&w=majority
-const mongoose = require('mongoose');
-require("dotenv").config();
-const { MONGOLAB_URI } = process.env;
+const knex = require('knex');
 
-mongoose.Promise = global.Promise;
+const knexfile = require('../knexfile');
 
-try {
-  mongoose .connect('mongodb+srv://OdooAPI:hS3ThkQJx6Vk7VH@cluster0.qytxo.mongodb.net/myFirstDatabase?retryWrites=true&w=majority', {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-    useFindAndModify: false
-  });
-} catch (err) {
-  throw err;
-}
 
-mongoose.connection.on("connected", () => {
-  console.log(`connected to database Naza DB`);
-});
+const env = process.env.NODE_ENV;
+const configOptions = knexfile[env];
 
-// To Remove moongoose deprecation warnings
-mongoose.set("useFindAndModify", false);
-mongoose.set("useCreateIndex", true);
+module.exports = knex(configOptions);

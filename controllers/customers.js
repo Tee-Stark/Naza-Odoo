@@ -2,8 +2,7 @@ const odoo = require("../config/odoo");
 const feedBack = require("../handler/feedbackHandler.js");
 const bcrypt = require("bcryptjs");
 const generateToken = require("../handler/authHandler.js");
-const customer = require("../models/customer");
-const feedbackHandler = require("../handler/feedbackHandler.js");
+const db = require('../config/db');
 // create a new customer
 const createCustomer = async (req, res) => {
   let { name, login, password } = req.body;
@@ -32,7 +31,7 @@ const createCustomer = async (req, res) => {
       wallet_counts: 1,
       free_member: true,
     });
-    const record = await customer.create({ login, password });
+    const record = await db('users').insert({ login, password });
     if (!record) {
       return feedBack.failed(
         res,
@@ -62,7 +61,7 @@ const loginCustomer = async (req, res) => {
     );
   }
   try {
-    const verified = await customer.findOne({ login: login });
+    const verified = await db('users').where({ login: login }).first();
     const correctPwd = await bcrypt.compare(password, verified.password);
     if (verified && correctPwd) {
       const user = await odoo.searchRead(
@@ -112,7 +111,7 @@ const getCustomerById = async (req, res) => {
         "image",
       ];
   try {
-    const result = await odoo.read("res.users", [parseInt(id)]);
+    const result = await odoo.read("res.users", [parseInt(id)], fields);
     if (!result || result.length === 0) {
       return feedBack.failed(res, 404, "User does not exist!", null);
     }
@@ -124,7 +123,7 @@ const getCustomerById = async (req, res) => {
 // to get all customers
 const getAllCustomers = async (req, res) => {
   try {
-    const result = await odoo.read("res.users");
+    const result = await odoo.read("res.users", [], ["name", "email"]);
     if (!result) {
       return await feedBack.failed(res, 404, "No record found", null);
     }
