@@ -31,7 +31,7 @@ const createCustomer = async (req, res) => {
       wallet_counts: 1,
       free_member: true,
     });
-    const record = await db('users').insert({ login, password });
+    const record = await db('customers').insert({ login, password });
     if (!record) {
       return feedBack.failed(
         res,
@@ -61,7 +61,7 @@ const loginCustomer = async (req, res) => {
     );
   }
   try {
-    const verified = await db('users').where({ login: login }).first();
+    const verified = await db('customers').where({ login: login }).first();
     const correctPwd = await bcrypt.compare(password, verified.password);
     if (verified && correctPwd) {
       const user = await odoo.searchRead(
