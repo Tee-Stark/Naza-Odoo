@@ -1,7 +1,6 @@
 const odoo = require("../config/odoo");
 const feedBack = require("../handler/feedbackHandler.js");
 const querystring = require("querystring");
-
 // /products `GET`
 // get all products
 const getProducts = async (req, res) => {
@@ -19,18 +18,57 @@ const getProducts = async (req, res) => {
         "display_name",
         "location_id",
         "rating_count",
+        "__last_update",
+        "create_date"
       ];
 
-  console.log(`Fields => ${fields}`);
+  //console.log(`Fields => ${fields}`);
+  let page = parseInt(req.query.page);
+  let limit = parseInt(req.query.limit);
+  let startIndex = (page - 1) * limit;
+  let endIndex = page * limit;
   try {
-    const result = await odoo.searchRead("product.product", {}, fields, {
-      limit: 25,
-      offset: 30,
+    let result = await odoo.search("product.product", {}, fields, {
+      //limit: 40d,
+      //offset: 30,
+      order: "create_date desc",
     });
     if (!result) {
       return await feedBack.failed(res, 400, "Unable to get products", null);
     }
-    await feedBack.success(res, 200, "Products returned successfully!", result);
+    //console.log(result);
+    let items = {};
+    //check whether to include a next/prev button or both
+    if (endIndex < result.length) {
+      items.next = {
+        page: page + 1,
+        limit: limit,
+      };
+    }
+    if (startIndex > 0) {
+      items.previous = {
+        page: page - 1,
+        limit: limit,
+      };
+    }
+    //console.log(items);
+    let i = 0;
+    var pageProducts = [];
+    let record = [];
+    for (i = startIndex; i <= endIndex; ++i) {
+      //console.log(result[i])
+      await odoo.searchRead(
+        "product.product",
+        { id: parseInt(result[i]) },
+        fields
+      ).then(prod => {
+        pageProducts.push(prod);
+        console.log(pageProducts);
+      })
+    }
+    items.products = [...pageProducts];
+    //console.log(items);
+    await feedBack.success(res, 200, "Products returned successfully!", items);
   } catch (error) {
     await feedBack.failed(res, 500, error.message, error);
   }
@@ -152,7 +190,7 @@ const getSingleProduct = async (req, res) => {
         id: parseInt(id),
       },
       fields
-      );
+    );
     if (!result) {
       return await feedBack.failed(res, 404, "Product does not exist!", null);
     }
