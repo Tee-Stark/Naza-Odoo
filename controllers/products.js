@@ -1,6 +1,7 @@
 const odoo = require("../config/odoo");
 const feedBack = require("../handler/feedbackHandler.js");
 const querystring = require("querystring");
+const { toImage, toImgString } = require("../handler/imageHandler");
 // /products `GET`
 // get all products
 const getProducts = async (req, res) => {
@@ -19,7 +20,7 @@ const getProducts = async (req, res) => {
         "location_id",
         "rating_count",
         "__last_update",
-        "create_date"
+        "create_date",
       ];
 
   //console.log(`Fields => ${fields}`);
@@ -57,14 +58,22 @@ const getProducts = async (req, res) => {
     let record = [];
     for (i = startIndex; i <= endIndex; ++i) {
       //console.log(result[i])
-      await odoo.searchRead(
+      record = await odoo.searchRead(
         "product.product",
         { id: parseInt(result[i]) },
         fields
-      ).then(prod => {
-        pageProducts.push(prod);
-        console.log(pageProducts);
-      })
+      );
+      record[0].image = !record[0].image
+        ? record[0].image
+        : toImage(record[0].image, `${record[0].name}-1`);
+      record[0].image_medium = !record[0].image_medium
+        ? record[0].image_medium
+        : toImage(record[0].image_medium, `${record[0].name}-2`);
+      record[0].image_small = !record[0].image_small
+        ? record[0].image_small
+        : toImage(record[0].image_small, `${record[0].name}-3`);
+      pageProducts.push(record);
+      console.log(pageProducts);
     }
     items.products = [...pageProducts];
     //console.log(items);
@@ -82,7 +91,7 @@ const getProductsByFilters = async (req, res) => {
   try {
     filters = querystring.parse(filterQuery);
     console.log(filters);
-    const products = await odoo.searchRead("product.product", filters, [
+    let products = await odoo.searchRead("product.product", filters, [
       "name",
       "price",
       "image",
@@ -95,6 +104,12 @@ const getProductsByFilters = async (req, res) => {
         null
       );
     }
+    for (let i = 0; i <= products.length; ++i) {
+      products[i].image = !products[i].image
+        ? products[i].image
+        : toImage(products[i].image, `${products[i].name}-1`);
+    }
+
     await feedBack.success(res, 200, "Success filtering products", products);
   } catch (error) {
     await feedBack.failed(res, 500, error.message, error);
@@ -129,9 +144,9 @@ const createProduct = async (req, res) => {
       uom_id,
       uom_po_id,
       pricelist_id: 3,
-      image,
-      image_small,
-      image_medium,
+      image: toImgString(image),
+      image_small: toImgString(image_small),
+      image_medium: toImgString(image_medium),
     });
     if (result) {
       return await feedBack.success(
@@ -184,17 +199,27 @@ const getSingleProduct = async (req, res) => {
         "taxes_id",
       ];
   try {
-    const result = await odoo.searchRead(
+    let record = await odoo.searchRead(
       "product.product",
       {
         id: parseInt(id),
       },
       fields
     );
-    if (!result) {
+    if (!record) {
       return await feedBack.failed(res, 404, "Product does not exist!", null);
     }
-    await feedBack.success(res, 200, "Product returned successfully", result);
+    record[0].image = !record[0].image
+        ? record[0].image
+        : toImage(record[0].image, `${record[0].name}-1`);
+      record[0].image_medium = !record[0].image_medium
+        ? record[0].image_medium
+        : toImage(record[0].image_medium, `${record[0].name}-2`);
+      record[0].image_small = !record[0].image_small
+        ? record[0].image_small
+        : toImage(record[0].image_small, `${record[0].name}-3`);
+    
+      await feedBack.success(res, 200, "Product returned successfully", record);
   } catch (error) {
     await feedBack.failed(res, 500, error.message, error);
   }
@@ -234,23 +259,28 @@ const getRelatedProducts = async (req, res) => {
     ? req.query.fields.split(",")
     : ["name", "price", "image"];
   try {
-    const result = await odoo.read("product.product", parseInt(id), [
+    const category = await odoo.read("product.product", parseInt(id), [
       "categ_id",
     ]);
-    console.log(result);
-    const category = await odoo.searchRead(
+    //console.log(category);
+    let products = await odoo.searchRead(
       "product.product",
-      ["categ_id", "=", parseInt(result[0].categ_id)],
+      ["categ_id", "=", parseInt(category[0].categ_id)],
       fields
     );
-    if (!category) {
+    if (!products) {
       return await feedBack.failed(res, 404, "Invalid product category", null);
+    }
+    for (let i = 0; i <= products.length; ++i) {
+      products[i].image = !products[i].image
+        ? products[i].image
+        : toImage(products[i].image, `${products[i].name}-1`);
     }
     await feedBack.success(
       res,
       200,
       "Related products returned successfully!",
-      category
+      products
     );
   } catch (error) {
     await feedBack.failed(res, 500, error.message, error);
@@ -364,6 +394,11 @@ const searchProduct = async (req, res) => {
     if (!searchResults) {
       return await feedBack.failed(res, 404, "No results!", null);
     }
+    for (let i = 0; i <= searchResults.length; ++i) {
+      searchResults[i].image = !searchResults[i].image
+        ? searchResults[i].image
+        : toImage(searchResults[i].image, `${searchResults[i].name}-1`);
+    }
     await feedBack.success(
       res,
       200,
@@ -379,7 +414,7 @@ const getProductsByCategory = async (req, res) => {
   const category_id = req.params.id;
   const fields = req.query.fields
     ? req.query.fields.split(",")
-    : ["name", "type", "image_1920"];
+    : ["name", "type", "image"];
   try {
     const products = await odoo.searchRead(
       "product.product",
@@ -393,6 +428,11 @@ const getProductsByCategory = async (req, res) => {
         "No products belong to this category!",
         null
       );
+    }
+    for (let i = 0; i <= products.length; ++i) {
+      products[i].image = !products[i].image
+        ? products[i].image
+        : toImage(products[i].image, `${products[i].name}-1`);
     }
     await feedBack.success(
       res,
