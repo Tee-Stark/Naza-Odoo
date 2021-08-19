@@ -65,15 +65,15 @@ const getProducts = async (req, res) => {
       );
       record[0].image = !record[0].image
         ? record[0].image
-        : toImage(record[0].image, `${record[0].name}-1`);
+        : await toImage(record[0].image, `${record[0].name}-1`);
       record[0].image_medium = !record[0].image_medium
         ? record[0].image_medium
-        : toImage(record[0].image_medium, `${record[0].name}-2`);
+        : await toImage(record[0].image_medium, `${record[0].name}-2`);
       record[0].image_small = !record[0].image_small
         ? record[0].image_small
-        : toImage(record[0].image_small, `${record[0].name}-3`);
+        : await toImage(record[0].image_small, `${record[0].name}-3`);
       pageProducts.push(record);
-      console.log(pageProducts);
+      //console.log(pageProducts);
     }
     items.products = [...pageProducts];
     //console.log(items);
@@ -107,7 +107,7 @@ const getProductsByFilters = async (req, res) => {
     for (let i = 0; i <= products.length; ++i) {
       products[i].image = !products[i].image
         ? products[i].image
-        : toImage(products[i].image, `${products[i].name}-1`);
+        : await toImage(products[i].image, `${products[i].name}-1`);
     }
 
     await feedBack.success(res, 200, "Success filtering products", products);
@@ -209,15 +209,16 @@ const getSingleProduct = async (req, res) => {
     if (!record) {
       return await feedBack.failed(res, 404, "Product does not exist!", null);
     }
+    console.log(await toImage(record[0].image, record[0].name));
     record[0].image = !record[0].image
         ? record[0].image
-        : toImage(record[0].image, `${record[0].name}-1`);
+        : await toImage(record[0].image, `${record[0].name}-1`);
       record[0].image_medium = !record[0].image_medium
         ? record[0].image_medium
-        : toImage(record[0].image_medium, `${record[0].name}-2`);
+        : await toImage(record[0].image_medium, `${record[0].name}-2`);
       record[0].image_small = !record[0].image_small
         ? record[0].image_small
-        : toImage(record[0].image_small, `${record[0].name}-3`);
+        : await toImage(record[0].image_small, `${record[0].name}-3`);
     
       await feedBack.success(res, 200, "Product returned successfully", record);
   } catch (error) {
@@ -274,7 +275,7 @@ const getRelatedProducts = async (req, res) => {
     for (let i = 0; i <= products.length; ++i) {
       products[i].image = !products[i].image
         ? products[i].image
-        : toImage(products[i].image, `${products[i].name}-1`);
+        : await toImage(products[i].image, `${products[i].name}-1`);
     }
     await feedBack.success(
       res,
@@ -397,7 +398,7 @@ const searchProduct = async (req, res) => {
     for (let i = 0; i <= searchResults.length; ++i) {
       searchResults[i].image = !searchResults[i].image
         ? searchResults[i].image
-        : toImage(searchResults[i].image, `${searchResults[i].name}-1`);
+        : await toImage(searchResults[i].image, `${searchResults[i].name}-1`);
     }
     await feedBack.success(
       res,
@@ -432,7 +433,7 @@ const getProductsByCategory = async (req, res) => {
     for (let i = 0; i <= products.length; ++i) {
       products[i].image = !products[i].image
         ? products[i].image
-        : toImage(products[i].image, `${products[i].name}-1`);
+        : await toImage(products[i].image, `${products[i].name}-1`);
     }
     await feedBack.success(
       res,
